@@ -1,0 +1,71 @@
+from flask import Flask 
+from flask import render_template
+from flask import request
+app = Flask(__name__)
+UID= {
+    "1":{'name':'ivan','town':'orsk',
+         'age':14},
+    "2":{"name":'oleg',"town": 'omsk',
+         "age":13},
+    "3":{"name":'ilya',
+         "town":'orel',
+         "age":19},
+    "4":{"name":'sofia',
+         "town":'anapa',
+         "age":20}
+}
+us={}
+
+c=len(UID)
+@app.route('/')
+def main():
+    return render_template('tab.html', data = UID)
+a= str(len(UID)+1)
+@app.route('/registration')
+def reg():
+    name = request.args.get('name')
+    town = request.args.get('town')
+    age = request.args.get('age')
+    us["name"]=name
+    us["town"]=town
+    us["age"]=age
+    UID[a]= us
+    b=int(a)+1
+    a=str(b)
+    return "name = {}; town = {}; age ={}". format(name, town, age)
+    
+@app.route('/user')
+def user():
+    return f'весь список пользователей: {UID}'
+@app.route('/authorization', methods=['GET', 'POST'])
+def authorization():
+    if request.method == 'POST':
+       Login = request.form.get('Login')
+       Password = request.form.get('Password')
+
+       if Login=="admin" and Password=="admin":
+           return "Correct"
+       else:
+           return "Incorrect"
+    return '''
+             <form method="POST">
+                 <div><label>Login: <input type="text" name="Login"></label></div>
+                 <div><label>Password: <input type="text" name="Password"></label></div>
+                 <input type="submit" value="Enter">
+             </form>'''
+    
+   
+@app.route('/users')
+def users():
+    return render_template('tab.html',data = UID)
+@app.route('/pip/<id>')
+def index(id):
+    if not id in UID:
+        return f'нет такого пользователя'
+    else:
+        return f'Здраствуйте {UID[id] ["name"]}, ваш номер: {id}'
+if __name__ == "__main__":
+    app.run(debug=True)
+print('до',c)
+print(UID)
+print("после",len(UID))
